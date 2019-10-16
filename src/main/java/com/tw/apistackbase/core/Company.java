@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-//@JsonIgnoreProperties(value = {"id"})
+@JsonIgnoreProperties(value = {"id"})
 public class Company {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

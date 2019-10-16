@@ -23,6 +23,15 @@ public class CompanyController {
         return companyRepository.findAll();
     }
 
+    @GetMapping(path = "/{name}")
+    public ResponseEntity<Company> get(@PathVariable String name){
+        Company company = companyRepository.findOneByName(name);
+        if (company != null) {
+            return new ResponseEntity(companyRepository.findOneByName(name), HttpStatus.OK);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<List<Company>> delete(@PathVariable Long id){
         Optional<Company> foundCompany = companyRepository.findById(id);
