@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
 public interface CompanyRepository extends JpaRepository<Company, Long> {
     @Query("Select c From Company c where c.name = :name")
     Company findOneByName(@Param("name") String name);
+
+    Company findByNameContaining(String name);
 }

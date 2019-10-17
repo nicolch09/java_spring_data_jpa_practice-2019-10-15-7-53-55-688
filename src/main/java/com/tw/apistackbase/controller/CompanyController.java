@@ -17,7 +17,7 @@ public class CompanyController {
     @Autowired
     CompanyRepository companyRepository;
 
-    @GetMapping(produces = {"application/json"})
+    @GetMapping(value = "/all", produces = {"application/json"})
     @ResponseStatus(code = HttpStatus.OK)
     public Iterable<Company> list() {
         return companyRepository.findAll();
@@ -28,6 +28,15 @@ public class CompanyController {
         Company company = companyRepository.findOneByName(name);
         if (company != null) {
             return new ResponseEntity(companyRepository.findOneByName(name), HttpStatus.OK);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Company>> getSpecific(@RequestParam(required = false) String name){
+        Optional<Company> company = Optional.ofNullable(companyRepository.findByNameContaining(name));
+        if (company != null) {
+            return new ResponseEntity(companyRepository.findByNameContaining(name), HttpStatus.OK);
         }
         return ResponseEntity.notFound().build();
     }
