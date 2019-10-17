@@ -1,14 +1,13 @@
 package com.tw.apistackbase.controller;
 
 import com.tw.apistackbase.core.Company;
-import com.tw.apistackbase.repository.CompanyRepository;
+import com.tw.apistackbase.service.CompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,51 +16,46 @@ import java.util.Optional;
 public class CompanyController {
 
     @Autowired
-    CompanyRepository companyRepository;
+    private CompanyService companyService;
 
     @GetMapping(value = "/all", produces = {"application/json"})
     @ResponseStatus(code = HttpStatus.OK)
-    public Iterable<Company> list(@RequestParam(required = false) Integer page, @RequestParam(required = false) Integer pageSize) {
-        return companyRepository.findAll(PageRequest.of(page,pageSize, Sort.by("name").ascending()));
+    public Iterable<Company> getAll(@RequestParam(required = false) Integer page, @RequestParam(required = false) Integer pageSize) {
+        return companyService.getAll(page, pageSize);
     }
 
     @GetMapping(path = "/{name}")
     public ResponseEntity<Company> get(@PathVariable String name){
-        Company company = companyRepository.findOneByName(name);
+        Company company = companyService.get(name);
         if (company != null) {
-            return new ResponseEntity(companyRepository.findOneByName(name), HttpStatus.OK);
+            return new ResponseEntity(company, HttpStatus.OK);
         }
         return ResponseEntity.notFound().build();
     }
 
     @GetMapping
     public ResponseEntity<List<Company>> getSpecific(@RequestParam(required = false) String name){
-        Optional<List<Company>> company = Optional.ofNullable(companyRepository.findByNameContaining(name));
+        Optional<List<Company>> company = Optional.ofNullable(companyService.getSpecific(name));
         if (company != null) {
-            return new ResponseEntity(companyRepository.findByNameContaining(name), HttpStatus.OK);
+            return new ResponseEntity(Arrays.asList(company), HttpStatus.OK);
         }
         return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<List<Company>> delete(@PathVariable Long id){
-        Optional<Company> foundCompany = companyRepository.findById(id);
-        if (foundCompany.isPresent()) {
-            companyRepository.deleteById(id);
-            return new ResponseEntity<>(companyRepository.findAll(), HttpStatus.OK);
+        List<Company> foundCompany = companyService.delete(id);
+        if (foundCompany != null) {
+            return new ResponseEntity<>(foundCompany, HttpStatus.OK);
         }
         return ResponseEntity.notFound().build();
     }
 
     @PatchMapping(path = "/{id}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Company> modify(@RequestBody Company company, @PathVariable Long id){
-        Optional<Company> foundCompany = companyRepository.findById(id);
-
+        Optional<Company> foundCompany = Optional.ofNullable(companyService.modify(company, id));
         if (foundCompany.isPresent()) {
-            Company modifyCompany = foundCompany.get();
-            modifyCompany.setName(company.getName());
-            Company savedCompany = companyRepository.save(modifyCompany);
-            return new ResponseEntity<>(savedCompany, HttpStatus.OK);
+            return new ResponseEntity(Arrays.asList(foundCompany), HttpStatus.OK);
         }
         return ResponseEntity.notFound().build();
     }
@@ -69,6 +63,6 @@ public class CompanyController {
     @PostMapping(produces = {"application/json"})
     @ResponseStatus(code = HttpStatus.CREATED)
     public Company add(@RequestBody Company company) {
-        return companyRepository.save(company);
+        return companyService.add(company);
     }
 }
