@@ -101,7 +101,7 @@ class CompanyControllerTest {
     void should_not_return_specific_data_when_name_like_doesnt_exist() throws Exception {
         when(companyService.getSpecific(any())).thenReturn(null);
 
-        ResultActions result = mvc.perform(get("/companies").param("name", "tite"));
+        ResultActions result = mvc.perform(get("/companies?name=Sample"));
 
         result.andExpect(status().isNotFound());
     }

@@ -35,7 +35,7 @@ public class CompanyController {
 
     @GetMapping
     public ResponseEntity<List<Company>> getSpecific(@RequestParam(required = false) String name){
-        Optional<List<Company>> company = Optional.ofNullable(companyService.getSpecific(name));
+        List<Company> company = companyService.getSpecific(name);
         if (company != null) {
             return new ResponseEntity(Arrays.asList(company), HttpStatus.OK);
         }
