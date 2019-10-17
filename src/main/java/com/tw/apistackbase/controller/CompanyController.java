@@ -3,6 +3,8 @@ package com.tw.apistackbase.controller;
 import com.tw.apistackbase.core.Company;
 import com.tw.apistackbase.repository.CompanyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +21,8 @@ public class CompanyController {
 
     @GetMapping(value = "/all", produces = {"application/json"})
     @ResponseStatus(code = HttpStatus.OK)
-    public Iterable<Company> list() {
-        return companyRepository.findAll();
+    public Iterable<Company> list(@RequestParam(required = false) Integer page, @RequestParam(required = false) Integer pageSize) {
+        return companyRepository.findAll(PageRequest.of(page,pageSize, Sort.by("name").ascending()));
     }
 
     @GetMapping(path = "/{name}")
@@ -34,7 +36,7 @@ public class CompanyController {
 
     @GetMapping
     public ResponseEntity<List<Company>> getSpecific(@RequestParam(required = false) String name){
-        Optional<Company> company = Optional.ofNullable(companyRepository.findByNameContaining(name));
+        Optional<List<Company>> company = Optional.ofNullable(companyRepository.findByNameContaining(name));
         if (company != null) {
             return new ResponseEntity(companyRepository.findByNameContaining(name), HttpStatus.OK);
         }
