@@ -53,9 +53,9 @@ public class CompanyController {
 
     @PatchMapping(path = "/{id}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Company> modify(@RequestBody Company company, @PathVariable Long id){
-        Optional<Company> foundCompany = Optional.ofNullable(companyService.modify(company, id));
-        if (foundCompany.isPresent()) {
-            return new ResponseEntity(Arrays.asList(foundCompany), HttpStatus.OK);
+        Company foundCompany = companyService.modify(company, id);
+        if (foundCompany != null) {
+            return new ResponseEntity(foundCompany, HttpStatus.OK);
         }
         return ResponseEntity.notFound().build();
     }
